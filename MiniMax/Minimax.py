@@ -1,11 +1,10 @@
 import abc
 import math
-from State import State
 from Tree import Node
 
 
 class Minimax(object):
-    def __get_best_col(self, children: list[Node]):
+    def get_best_col(self, children: list[Node]):
         best_col, max_score = 0, math.inf * -1
         for i in range(len(children)):
             if children[i].get_value() > max_score:

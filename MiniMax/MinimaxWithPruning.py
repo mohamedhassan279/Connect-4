@@ -2,7 +2,7 @@ import math
 import Heuristic
 from State import State
 from Tree import Node
-from Minimax import Minimax
+from MiniMax.Minimax import Minimax
 
 
 class MinimaxWithPruning(Minimax):
@@ -23,7 +23,7 @@ class MinimaxWithPruning(Minimax):
                                  root)  # this score must be equal to root.get_value()
         # now we must pick the state whose value is the maximum in the children list of the root
         children: list[Node] = root.get_Childern()
-        best_col = self.__get_best_col(children)
+        best_col = self.get_best_col(children)
         return best_col, score, root
 
     def __max_value(self, state: State, alpha, beta, remaining_depth, parent: Node):

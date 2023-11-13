@@ -46,9 +46,28 @@ class State:
             occupied = self.__get_occupied(col_rep)
             if occupied < 6:  # can drop a chip
                 successor = deepcopy(self)
-                successor.__drop_chip(j, col_rep, occupied)
+                successor.drop_chip(j)
                 successors.append(successor)
         return successors
+
+    def drop_chip(self, col_number):
+        col_rep = self.__get_col(col_number)
+        occupied = self.__get_occupied(col_rep)
+        turn = self.__get_cur_turn()
+        col_rep |= (turn << occupied)
+        occupied += 1
+        pw = 2
+        while pw >= 0:
+            exp = 1 << pw
+            if occupied >= exp:
+                col_rep |= (1 << (6 + pw))
+                occupied -= exp
+            else:
+                col_rep &= ~(1 << (6 + pw))
+            pw -= 1
+        self.__state &= (((1 << 64) - 1) ^ self.__get_col_mask(col_number))
+        self.__state |= (col_rep << (9 * col_number))
+        self.__moves += 1
 
     def __get_col(self, col_number):  # return the 9 bits of this column
         return (self.__state & self.__get_col_mask(col_number)) >> (9 * col_number)
@@ -70,23 +89,6 @@ class State:
             else:
                 col.append(0)
         return col
-
-    def __drop_chip(self, col_number, col_rep, occupied):
-        turn = self.__get_cur_turn()
-        col_rep |= (turn << occupied)
-        occupied += 1
-        pw = 2
-        while pw >= 0:
-            exp = 1 << pw
-            if occupied >= exp:
-                col_rep |= (1 << (6 + pw))
-                occupied -= exp
-            else:
-                col_rep &= ~(1 << (6 + pw))
-            pw -= 1
-        self.__state &= (((1 << 64) - 1) ^ self.__get_col_mask(col_number))
-        self.__state |= (col_rep << (9 * col_number))
-        self.__moves += 1
 
     """
     return the current player turn

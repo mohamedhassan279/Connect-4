@@ -1,6 +1,6 @@
 import math
 
-from Heuristic import Heuristic
+from Heuristic.Heuristic import Heuristic
 from State import State
 
 
@@ -58,7 +58,7 @@ class Heuristic1(Heuristic):
                     second_group += 1
                     j += 1
                 if first_group == 1 and second_group == 1:  # in case space + 1 chip + 1 space + 1 chip
-                    score += self.__get_score_sign(player) * \
+                    score += self.get_score_sign(player) * \
                              self.__solve_single_chip(start_j, space_before + space_between)
                     j -= 1
                     space_before = space_between
@@ -136,8 +136,8 @@ class Heuristic1(Heuristic):
                         i += 1
                         j += 1
                     if first_group == 1 and second_group == 1:  # in case space + 1 chip + 1 space + 1 chip
-                        score += self.__get_score_sign(player) * self.__solve_single_chip(start_j,
-                                                                                          space_before + space_between)
+                        score += self.get_score_sign(player) * self.__solve_single_chip(start_j,
+                                                                                         space_before + space_between)
                         i -= 1
                         j -= 1
                         space_before = space_between
@@ -193,8 +193,8 @@ class Heuristic1(Heuristic):
                         i += 1
                         j += 1
                     if first_group == 1 and second_group == 1:  # in case space + 1 chip + 1 space + 1 chip
-                        score += self.__get_score_sign(player) * self.__solve_single_chip(start_j,
-                                                                                          space_before + space_between)
+                        score += self.get_score_sign(player) * self.__solve_single_chip(start_j,
+                                                                                         space_before + space_between)
                         i -= 1
                         j -= 1
                         space_before = space_between
@@ -253,8 +253,8 @@ class Heuristic1(Heuristic):
                         i -= 1
                         j += 1
                     if first_group == 1 and second_group == 1:  # in case space + 1 chip + 1 space + 1 chip
-                        score += self.__get_score_sign(player) * self.__solve_single_chip(start_j,
-                                                                                          space_before + space_between)
+                        score += self.get_score_sign(player) * self.__solve_single_chip(start_j,
+                                                                                         space_before + space_between)
                         i += 1
                         j -= 1
                         space_before = space_between
@@ -310,8 +310,8 @@ class Heuristic1(Heuristic):
                         i -= 1
                         j += 1
                     if first_group == 1 and second_group == 1:  # in case space + 1 chip + 1 space + 1 chip
-                        score += self.__get_score_sign(player) * self.__solve_single_chip(start_j,
-                                                                                          space_before + space_between)
+                        score += self.get_score_sign(player) * self.__solve_single_chip(start_j,
+                                                                                         space_before + space_between)
                         i += 1
                         j -= 1
                         space_before = space_between
@@ -338,7 +338,7 @@ class Heuristic1(Heuristic):
             score += self.__solve_three_chips(space_before, first_group, space_between)
         else:  # Four or more chips
             score += self.__solve_four_or_more_chips(space_before, first_group, space_between, second_group)
-        return self.__get_score_sign(player) * score
+        return self.get_score_sign(player) * score
 
     # Start the functions that get the heuristic
     def __solve_single_chip(self, j, spaces):
@@ -386,8 +386,3 @@ class Heuristic1(Heuristic):
         return score
 
     # End the functions that get the heuristic
-
-    def __get_score_sign(self, player):
-        if player == 1:  # if it's the human player then we return negative one (human is player 1)
-            return -1
-        return 1  # if it's our AI agent then we return one because we want our agent to win
