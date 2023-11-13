@@ -1,5 +1,5 @@
 import math
-import Heuristic
+from Heuristic.Heuristic import Heuristic
 from State import State
 from Tree import Node
 from MiniMax.Minimax import Minimax
