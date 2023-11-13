@@ -5,7 +5,7 @@ from Tree import Node
 from MiniMax.Minimax import Minimax
 
 
-class MinimaxWOPruning(Minimax):
+class MinimaxWoPruning(Minimax):
     def __init__(self, heuristic):
         self.__heuristic: Heuristic = heuristic
 
