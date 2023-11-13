@@ -73,6 +73,222 @@ class Heuristic1(Heuristic):
                     score += self.solve_group(player, j, 0, group, 0, 0)
         return score
 
+    def lower_reversed_diagonal_score(self, board: list):
+        score: int = 0
+        for diagonal in range(1, 4):  # iterate over the reversed diagonal from col 1 -> 3
+            i, j = 0, diagonal
+            space_before = 0
+            while j < 7:
+                while j < 7 and board[i][j] == 0:  # count spaces before group
+                    space_before += 1
+                    i += 1
+                    j += 1
+                if space_before + diagonal == 7:  # all diagonal is empty --> break
+                    break
+
+                if(j < 7):
+                    # count the consecutive chips
+                    player = board[i][j]
+                    start_j = j
+                    first_group = 0
+                    while j < 7 and board[i][j] == player:
+                        first_group += 1
+                        i += 1
+                        j += 1
+                    if j == 7 or board[i][j] != 0:  # the diagonal ends, or we found the opponent in the way --> stop
+                        score += self.solve_group(player, start_j, space_before, first_group, 0, 0)
+                        continue
+
+                    # case of: some empty cells + consecutive group + some empty cells
+                    space_between = 0
+                    while j < 7 and board[i][j] == 0:  # count spaces after first_group
+                        space_between += 1
+                        i += 1
+                        j += 1
+                    if space_between > 1 or j == 7 or board[i][j] != player:  # case of space(s) + group + 2 or more spaces
+                        score += self.solve_group(player, start_j, space_before, first_group, space_between, 0)
+                        space_before = space_between
+                        continue
+                    second_group = 0
+                    while j < 7 and board[i][j] == player:  # count the second group of consecutive chips
+                        second_group += 1
+                        i += 1
+                        j += 1
+                    if first_group == 1 and second_group == 1:  # in case space + 1 chip + 1 space + 1 chip
+                        score += self.get_score_sign(player) * self.solve_single_chip(start_j, space_before + space_between)
+                        i -= 1
+                        j -= 1
+                        space_before = space_between
+                        continue
+                    else:
+                        score += self.solve_group(player, start_j, space_before,
+                                                      first_group, space_between, second_group)
+        return score
+
+    def upper_reversed_diagonal_score(self, board: list):
+        score: int = 0
+        for diagonal in range(3):  # iterate over the reversed diagonal from row 0 -> 2
+            i, j = diagonal, 0
+            space_before = 0
+            while i < 6:
+                while i < 6 and board[i][j] == 0:  # count spaces before group
+                    space_before += 1
+                    i += 1
+                    j += 1
+                if space_before + diagonal == 6:  # all diagonal is empty --> break
+                    break
+
+                if(i < 6):
+                    # count the consecutive chips
+                    player = board[i][j]
+                    start_j = j
+                    first_group = 0
+                    while i < 6 and board[i][j] == player:
+                        first_group += 1
+                        i += 1
+                        j += 1
+                    if i == 6 or board[i][j] != 0:  # the diagonal ends, or we found the opponent in the way --> stop
+                        score += self.solve_group(player, start_j, space_before, first_group, 0, 0)
+                        continue
+
+                    # case of: some empty cells + consecutive group + some empty cells
+                    space_between = 0
+                    while i < 6 and board[i][j] == 0:  # count spaces after first_group
+                        space_between += 1
+                        i += 1
+                        j += 1
+                    if space_between > 1 or i == 6 or board[i][j] != player:  # case of space(s) + group + 2 or more spaces
+                        score += self.solve_group(player, start_j, space_before, first_group, space_between, 0)
+                        space_before = space_between
+                        continue
+                    second_group = 0
+                    while i < 6 and board[i][j] == player:  # count the second group of consecutive chips
+                        second_group += 1
+                        i += 1
+                        j += 1
+                    if first_group == 1 and second_group == 1:  # in case space + 1 chip + 1 space + 1 chip
+                        score += self.get_score_sign(player) * self.solve_single_chip(start_j, space_before + space_between)
+                        i -= 1
+                        j -= 1
+                        space_before = space_between
+                        continue
+                    else:
+                        score += self.solve_group(player, start_j, space_before,
+                                                      first_group, space_between, second_group)
+        return score
+
+
+    def upper_main_diagonal_score(self, board: list):
+        score: int = 0
+        for diagonal in range(1, 4):  # iterate over the reversed diagonal from col 1 -> 3
+            i, j = 5, diagonal
+            space_before = 0
+            while j < 7:
+                while j < 7 and board[i][j] == 0:  # count spaces before group
+                    space_before += 1
+                    i -= 1
+                    j += 1
+                if space_before + diagonal == 7:  # all diagonal is empty --> break
+                    break
+
+                if(j < 7):
+                    # count the consecutive chips
+                    player = board[i][j]
+                    start_j = j
+                    first_group = 0
+                    while j < 7 and board[i][j] == player:
+                        first_group += 1
+                        i -= 1
+                        j += 1
+                    if j == 7 or board[i][j] != 0:  # the diagonal ends, or we found the opponent in the way --> stop
+                        score += self.solve_group(player, start_j, space_before, first_group, 0, 0)
+                        continue
+
+                    # case of: some empty cells + consecutive group + some empty cells
+                    space_between = 0
+                    while j < 7 and board[i][j] == 0:  # count spaces after first_group
+                        space_between += 1
+                        i -= 1
+                        j += 1
+                    if space_between > 1 or j == 7 or board[i][j] != player:  # case of space(s) + group + 2 or more spaces
+                        score += self.solve_group(player, start_j, space_before, first_group, space_between, 0)
+                        space_before = space_between
+                        continue
+                    second_group = 0
+                    while j < 7 and board[i][j] == player:  # count the second group of consecutive chips
+                        second_group += 1
+                        i -= 1
+                        j += 1
+                    if first_group == 1 and second_group == 1:  # in case space + 1 chip + 1 space + 1 chip
+                        score += self.get_score_sign(player) * self.solve_single_chip(start_j, space_before + space_between)
+                        i += 1
+                        j -= 1
+                        space_before = space_between
+                        continue
+                    else:
+                        score += self.solve_group(player, start_j, space_before,
+                                                      first_group, space_between, second_group)
+        return score
+
+    def lower_main_diagonal_score(self, board: list):
+        score: int = 0
+        for diagonal in range(3, 6):  # iterate over the reversed diagonal from row 0 -> 2
+            i, j = diagonal, 0
+            space_before = 0
+            while i >= 0:
+                while i >= 0 and board[i][j] == 0:  # count spaces before group
+                    space_before += 1
+                    i -= 1
+                    j += 1
+                if space_before - diagonal == 1:  # all diagonal is empty --> break
+                    break
+
+                if(i >= 0):
+                    # count the consecutive chips
+                    player = board[i][j]
+                    start_j = j
+                    first_group = 0
+                    while i >= 0 and board[i][j] == player:
+                        first_group += 1
+                        i -= 1
+                        j += 1
+                    if i == -1 or board[i][j] != 0:  # the diagonal ends, or we found the opponent in the way --> stop
+                        score += self.solve_group(player, start_j, space_before, first_group, 0, 0)
+                        continue
+
+                    # case of: some empty cells + consecutive group + some empty cells
+                    space_between = 0
+                    while i >= 0 and board[i][j] == 0:  # count spaces after first_group
+                        space_between += 1
+                        i -= 1
+                        j += 1
+                    if space_between > 1 or i == -1 or board[i][j] != player:  # case of space(s) + group + 2 or more spaces
+                        score += self.solve_group(player, start_j, space_before, first_group, space_between, 0)
+                        space_before = space_between
+                        continue
+                    second_group = 0
+                    while i >= 0 and board[i][j] == player:  # count the second group of consecutive chips
+                        second_group += 1
+                        i -= 1
+                        j += 1
+                    if first_group == 1 and second_group == 1:  # in case space + 1 chip + 1 space + 1 chip
+                        score += self.get_score_sign(player) * self.solve_single_chip(start_j, space_before + space_between)
+                        i += 1
+                        j -= 1
+                        space_before = space_between
+                        continue
+                    else:
+                        score += self.solve_group(player, start_j, space_before,
+                                                      first_group, space_between, second_group)
+        return score
+
+
+
+
+    def solve_group(self, player, j, space_before, first_group, space_between, second_group):
+        pass
+
+
     def solve_group(self, player, j, space_before, first_group, space_between, second_group):
         score: int = 0
         spaces = space_before + space_between
