@@ -1,22 +1,22 @@
 import math
 
 from Heuristic import Heuristic
+from State import State
 
 
 class Heuristic1(Heuristic):
     max_score = math.pow(10, 12)
 
-    def get_score(self, current_state):
-        #TODO here we want to get the 2D array equivelent to this curr_state and then we call
-        #TODO row_score + diagonlas_score + col_score and return the result
-        pass
+    def get_score(self, current_state: State):
+        board = current_state.convert_to_board()
+        return self.row_score(board) + self.col_score(board) + self.diagonals_score(board)
 
     def diagonals_score(self, board):
         """
         function to get all diagonals score of the board
         """
-        return self.lower_main_diagonal_score(board) + self.upper_main_diagonal_score(board) +\
-               self.lower_reversed_diagonal_score(board) + self.upper_reversed_diagonal_score(board)
+        return self.lower_main_diagonal_score(board) + self.upper_main_diagonal_score(board) + \
+            self.lower_reversed_diagonal_score(board) + self.upper_reversed_diagonal_score(board)
 
     def row_score(self, board: list):
         """
@@ -105,7 +105,7 @@ class Heuristic1(Heuristic):
                 if space_before + diagonal == 7:  # all diagonal is empty --> break
                     break
 
-                if(j < 7):
+                if (j < 7):
                     # count the consecutive chips
                     player = board[i][j]
                     start_j = j
@@ -124,7 +124,8 @@ class Heuristic1(Heuristic):
                         space_between += 1
                         i += 1
                         j += 1
-                    if space_between > 1 or j == 7 or board[i][j] != player:  # case of space(s) + group + 2 or more spaces
+                    if space_between > 1 or j == 7 or board[i][
+                        j] != player:  # case of space(s) + group + 2 or more spaces
                         score += self.solve_group(player, start_j, space_before, first_group, space_between, 0)
                         space_before = space_between
                         continue
@@ -134,14 +135,15 @@ class Heuristic1(Heuristic):
                         i += 1
                         j += 1
                     if first_group == 1 and second_group == 1:  # in case space + 1 chip + 1 space + 1 chip
-                        score += self.get_score_sign(player) * self.solve_single_chip(start_j, space_before + space_between)
+                        score += self.get_score_sign(player) * self.solve_single_chip(start_j,
+                                                                                      space_before + space_between)
                         i -= 1
                         j -= 1
                         space_before = space_between
                         continue
                     else:
                         score += self.solve_group(player, start_j, space_before,
-                                                      first_group, space_between, second_group)
+                                                  first_group, space_between, second_group)
         return score
 
     def upper_reversed_diagonal_score(self, board: list):
@@ -160,7 +162,7 @@ class Heuristic1(Heuristic):
                 if space_before + diagonal == 6:  # all diagonal is empty --> break
                     break
 
-                if(i < 6):
+                if (i < 6):
                     # count the consecutive chips
                     player = board[i][j]
                     start_j = j
@@ -179,7 +181,8 @@ class Heuristic1(Heuristic):
                         space_between += 1
                         i += 1
                         j += 1
-                    if space_between > 1 or i == 6 or board[i][j] != player:  # case of space(s) + group + 2 or more spaces
+                    if space_between > 1 or i == 6 or board[i][
+                        j] != player:  # case of space(s) + group + 2 or more spaces
                         score += self.solve_group(player, start_j, space_before, first_group, space_between, 0)
                         space_before = space_between
                         continue
@@ -189,14 +192,15 @@ class Heuristic1(Heuristic):
                         i += 1
                         j += 1
                     if first_group == 1 and second_group == 1:  # in case space + 1 chip + 1 space + 1 chip
-                        score += self.get_score_sign(player) * self.solve_single_chip(start_j, space_before + space_between)
+                        score += self.get_score_sign(player) * self.solve_single_chip(start_j,
+                                                                                      space_before + space_between)
                         i -= 1
                         j -= 1
                         space_before = space_between
                         continue
                     else:
                         score += self.solve_group(player, start_j, space_before,
-                                                      first_group, space_between, second_group)
+                                                  first_group, space_between, second_group)
         return score
 
     ##############################End reversed diagonals score fucntions###############
@@ -218,7 +222,7 @@ class Heuristic1(Heuristic):
                 if space_before + diagonal == 7:  # all diagonal is empty --> break
                     break
 
-                if(j < 7):
+                if (j < 7):
                     # count the consecutive chips
                     player = board[i][j]
                     start_j = j
@@ -237,7 +241,8 @@ class Heuristic1(Heuristic):
                         space_between += 1
                         i -= 1
                         j += 1
-                    if space_between > 1 or j == 7 or board[i][j] != player:  # case of space(s) + group + 2 or more spaces
+                    if space_between > 1 or j == 7 or board[i][
+                        j] != player:  # case of space(s) + group + 2 or more spaces
                         score += self.solve_group(player, start_j, space_before, first_group, space_between, 0)
                         space_before = space_between
                         continue
@@ -247,14 +252,15 @@ class Heuristic1(Heuristic):
                         i -= 1
                         j += 1
                     if first_group == 1 and second_group == 1:  # in case space + 1 chip + 1 space + 1 chip
-                        score += self.get_score_sign(player) * self.solve_single_chip(start_j, space_before + space_between)
+                        score += self.get_score_sign(player) * self.solve_single_chip(start_j,
+                                                                                      space_before + space_between)
                         i += 1
                         j -= 1
                         space_before = space_between
                         continue
                     else:
                         score += self.solve_group(player, start_j, space_before,
-                                                      first_group, space_between, second_group)
+                                                  first_group, space_between, second_group)
         return score
 
     def lower_main_diagonal_score(self, board: list):
@@ -273,7 +279,7 @@ class Heuristic1(Heuristic):
                 if space_before - diagonal == 1:  # all diagonal is empty --> break
                     break
 
-                if(i >= 0):
+                if (i >= 0):
                     # count the consecutive chips
                     player = board[i][j]
                     start_j = j
@@ -292,7 +298,8 @@ class Heuristic1(Heuristic):
                         space_between += 1
                         i -= 1
                         j += 1
-                    if space_between > 1 or i == -1 or board[i][j] != player:  # case of space(s) + group + 2 or more spaces
+                    if space_between > 1 or i == -1 or board[i][
+                        j] != player:  # case of space(s) + group + 2 or more spaces
                         score += self.solve_group(player, start_j, space_before, first_group, space_between, 0)
                         space_before = space_between
                         continue
@@ -302,14 +309,15 @@ class Heuristic1(Heuristic):
                         i -= 1
                         j += 1
                     if first_group == 1 and second_group == 1:  # in case space + 1 chip + 1 space + 1 chip
-                        score += self.get_score_sign(player) * self.solve_single_chip(start_j, space_before + space_between)
+                        score += self.get_score_sign(player) * self.solve_single_chip(start_j,
+                                                                                      space_before + space_between)
                         i += 1
                         j -= 1
                         space_before = space_between
                         continue
                     else:
                         score += self.solve_group(player, start_j, space_before,
-                                                      first_group, space_between, second_group)
+                                                  first_group, space_between, second_group)
         return score
 
     ##############################End main diagonals score fucntions###############
@@ -330,7 +338,6 @@ class Heuristic1(Heuristic):
         else:  # Four or more chips
             score += self.solve_four_or_more_chips(space_before, first_group, space_between, second_group)
         return self.get_score_sign(player) * score
-
 
     #############################Start the functions that get the heauristic#########################
     def solve_single_chip(self, j, spaces):
@@ -376,9 +383,10 @@ class Heuristic1(Heuristic):
             if new_group > 0:
                 score += new_group * 900000
         return score
+
     #############################End the functions that get the heauristic#########################
 
     def get_score_sign(self, player):
-        if player == 1:  #if it's the human player then we retuen negative one (human is player 1)
+        if player == 1:  # if it's the human player then we retuen negative one (human is player 1)
             return -1
-        return 1    # if it's our AI agent then we return one because we want our agent to win
+        return 1  # if it's our AI agent then we return one because we want our agent to win
