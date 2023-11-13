@@ -24,7 +24,6 @@ class MyTestCase1(unittest.TestCase):
         successors = st.get_successors()
         calc = [successors[i].convert_to_board() for i in range(7)]
         self.assertEqual(correct, calc)  # add assertion here
-        self.assertEqual(successors[0].moves, 1)  # add assertion here
 
 
 class MyTestCase2(unittest.TestCase):

@@ -19,8 +19,8 @@ col_mask = [511, 261632, 133955584, 68585259008, 35115652612096, 179792141373931
 class State:
 
     def __init__(self):
-        self.state = 0
-        self.moves = 0
+        self.__state = 0
+        self.__moves = 0
 
     """
     Convert the state to 2d board
@@ -33,7 +33,7 @@ class State:
     def convert_to_board(self):
         board = [[0 for _ in range(7)] for _ in range(6)]
         for j in range(7):
-            col_list = self.get_col_list(j)
+            col_list = self.__get_col_list(j)
             for i in range(6):
                 board[i][j] = col_list[i]
         return board
@@ -42,23 +42,23 @@ class State:
     def get_successors(self):
         successors = []
         for j in range(7):
-            col_rep = self.get_col(j)
-            occupied = self.get_occupied(col_rep)
+            col_rep = self.__get_col(j)
+            occupied = self.__get_occupied(col_rep)
             if occupied < 6:  # can drop a chip
                 successor = deepcopy(self)
-                successor.drop_chip(j, col_rep, occupied)
+                successor.__drop_chip(j, col_rep, occupied)
                 successors.append(successor)
         return successors
 
-    def get_col(self, col_number):  # return the 9 bits of this column
-        return (self.state & self.get_col_mask(col_number)) >> (9 * col_number)
+    def __get_col(self, col_number):  # return the 9 bits of this column
+        return (self.__state & self.__get_col_mask(col_number)) >> (9 * col_number)
 
-    def get_occupied(self, col_rep):  # number of occupied cells in the col
+    def __get_occupied(self, col_rep):  # number of occupied cells in the col
         return (col_rep & 448) >> 6
 
-    def get_col_list(self, col_number):  # returns a list representation of the col
-        col_rep = self.get_col(col_number)
-        occupied = self.get_occupied(col_rep)
+    def __get_col_list(self, col_number):  # returns a list representation of the col
+        col_rep = self.__get_col(col_number)
+        occupied = self.__get_occupied(col_rep)
         col = []
         for i in range(6):
             if i < occupied:
@@ -71,8 +71,8 @@ class State:
                 col.append(0)
         return col
 
-    def drop_chip(self, col_number, col_rep, occupied):
-        turn = self.get_cur_turn()
+    def __drop_chip(self, col_number, col_rep, occupied):
+        turn = self.__get_cur_turn()
         col_rep |= (turn << occupied)
         occupied += 1
         pw = 2
@@ -84,17 +84,17 @@ class State:
             else:
                 col_rep &= ~(1 << (6 + pw))
             pw -= 1
-        self.state &= (((1 << 64) - 1) ^ self.get_col_mask(col_number))
-        self.state |= (col_rep << (9 * col_number))
-        self.moves += 1
+        self.__state &= (((1 << 64) - 1) ^ self.__get_col_mask(col_number))
+        self.__state |= (col_rep << (9 * col_number))
+        self.__moves += 1
 
     """
     return the current player turn
     0 --> player 1 turn
     1 --> player 2 turn
     """
-    def get_cur_turn(self):
-        return self.moves & 1  # if odd --> player 2 turn --> return 1
+    def __get_cur_turn(self):
+        return self.__moves & 1  # if odd --> player 2 turn --> return 1
 
-    def get_col_mask(self, col_number):  # helping function
+    def __get_col_mask(self, col_number):  # helping function
         return col_mask[col_number]
