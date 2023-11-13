@@ -17,10 +17,8 @@ col_mask = [511, 261632, 133955584, 68585259008, 35115652612096, 179792141373931
 
 
 class State:
-    state = 0
-    moves = 0
 
-    def __int__(self):
+    def __init__(self):
         self.state = 0
         self.moves = 0
 
@@ -32,7 +30,6 @@ class State:
     increasing i moves up in the board
     increasing j moves right in the board
     """
-
     def convert_to_board(self):
         board = [[0 for _ in range(7)] for _ in range(6)]
         for j in range(7):
@@ -96,7 +93,6 @@ class State:
     0 --> player 1 turn
     1 --> player 2 turn
     """
-
     def get_cur_turn(self):
         return self.moves & 1  # if odd --> player 2 turn --> return 1
 
