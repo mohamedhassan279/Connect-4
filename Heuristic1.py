@@ -7,9 +7,21 @@ class Heuristic1(Heuristic):
     max_score = math.pow(10, 12)
 
     def get_score(self, current_state):
+        #TODO here we want to get the 2D array equivelent to this curr_state and then we call
+        #TODO row_score + diagonlas_score + col_score and return the result
         pass
 
+    def diagonals_score(self, board):
+        """
+        function to get all diagonals score of the board
+        """
+        return self.lower_main_diagonal_score(board) + self.upper_main_diagonal_score(board) +\
+               self.lower_reversed_diagonal_score(board) + self.upper_reversed_diagonal_score(board)
+
     def row_score(self, board: list):
+        """
+        function to get the score of the board row by row
+        """
         score: int = 0
         for i in range(6):  # iterate over each row
             j = 0
@@ -56,6 +68,9 @@ class Heuristic1(Heuristic):
         return score
 
     def col_score(self, board: list):
+        """
+        function to get the score of the board col by col
+        """
         score: int = 0
         for j in range(7):  # iterate over each col
             i = 0
@@ -73,7 +88,11 @@ class Heuristic1(Heuristic):
                     score += self.solve_group(player, j, 0, group, 0, 0)
         return score
 
+    ##############################Start reversed diagonals score fucntions###############
     def lower_reversed_diagonal_score(self, board: list):
+        """
+        function to get the score of the lower half of the 45 degree diagonals
+        """
         score: int = 0
         for diagonal in range(1, 4):  # iterate over the reversed diagonal from col 1 -> 3
             i, j = 0, diagonal
@@ -126,6 +145,9 @@ class Heuristic1(Heuristic):
         return score
 
     def upper_reversed_diagonal_score(self, board: list):
+        """
+        function to get the score of the upper half of the 45 degree diagonals
+        """
         score: int = 0
         for diagonal in range(3):  # iterate over the reversed diagonal from row 0 -> 2
             i, j = diagonal, 0
@@ -177,8 +199,13 @@ class Heuristic1(Heuristic):
                                                       first_group, space_between, second_group)
         return score
 
+    ##############################End reversed diagonals score fucntions###############
 
+    ##############################Start main diagonals score fucntions###############
     def upper_main_diagonal_score(self, board: list):
+        """
+        function to get the score of the upper half of the 135 degree diagonals
+        """
         score: int = 0
         for diagonal in range(1, 4):  # iterate over the reversed diagonal from col 1 -> 3
             i, j = 5, diagonal
@@ -231,6 +258,9 @@ class Heuristic1(Heuristic):
         return score
 
     def lower_main_diagonal_score(self, board: list):
+        """
+        function to get the score of the lower half of the 135 degree diagonals
+        """
         score: int = 0
         for diagonal in range(3, 6):  # iterate over the reversed diagonal from row 0 -> 2
             i, j = diagonal, 0
@@ -282,14 +312,13 @@ class Heuristic1(Heuristic):
                                                       first_group, space_between, second_group)
         return score
 
-
-
-
-    def solve_group(self, player, j, space_before, first_group, space_between, second_group):
-        pass
-
+    ##############################End main diagonals score fucntions###############
 
     def solve_group(self, player, j, space_before, first_group, space_between, second_group):
+        """
+        a delegator that delegates the work to its suitable function based on the first group and
+        the second
+        """
         score: int = 0
         spaces = space_before + space_between
         if first_group == 1 and second_group == 0:  # single chip
@@ -302,6 +331,8 @@ class Heuristic1(Heuristic):
             score += self.solve_four_or_more_chips(space_before, first_group, space_between, second_group)
         return self.get_score_sign(player) * score
 
+
+    #############################Start the functions that get the heauristic#########################
     def solve_single_chip(self, j, spaces):
         if spaces < 3:
             return 0
@@ -345,8 +376,9 @@ class Heuristic1(Heuristic):
             if new_group > 0:
                 score += new_group * 900000
         return score
+    #############################End the functions that get the heauristic#########################
 
     def get_score_sign(self, player):
-        if player == 1:
+        if player == 1:  #if it's the human player then we retuen negative one (human is player 1)
             return -1
-        return 1
+        return 1    # if it's our AI agent then we return one because we want our agent to win
