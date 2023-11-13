@@ -14,7 +14,7 @@ class Heuristic2(Heuristic):
         score: int = 0
         for j in range(7):
             for i in range(6):
-                if board[i][j] == 0:  # cell i,j is empty and thus remaning values in column is empty
+                if board[i][j] == 0:  # cell i,j is empty and thus remaining values in column is empty
                     break
                 score += self.__calcHeuristic(board[i][j], i, j)
         return score
