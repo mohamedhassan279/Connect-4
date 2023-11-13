@@ -1,36 +1,32 @@
 import math
-
 import Heuristic
-import State
+from State import State
 from Tree import Node
+from Minimax import Minimax
 
 
-class MinimaxWithPruning:
+class MinimaxWithPruning(Minimax):
 
     def __init__(self, heuristic: Heuristic):
         self.heuristic = heuristic
 
     def get_best_move(self, state, max_depth):
         """
-        -> the function that our agent will call in order to get the best move
-        -> takes: the current state, and the maximum depth as parameters
-        -> returns: the col to play in,
-                    the score of this best state, and a pointer to the minimax tree rooted at the passed state whose depth is max_depth, or smaller
-                    if the game will end after some levels < max_depth
-        """
+         -> the function that our agent will call in order to get the best move
+         -> takes: the current state, and the maximum depth as parameters
+         -> returns: the col to play in,
+                     the score of this best state, and a pointer to the minimax tree rooted at the passed state whose depth is max_depth, or smaller
+                     if the game will end after some levels < max_depth
+         """
         root = Node(-1)
-        score = self.max_value(state, math.inf * -1, math.inf, max_depth, root) #this score must be equal to root.get_value()
-        #now we must pick the state whose value is the maximum in the children list of the root
-        children:list[Node] = root.get_Childern()
-        best_col, maxScore = 0, math.inf * -1
-        for i in range(len(children)):
-            if children[i].get_value() > maxScore:
-                maxScore = children[i].get_value()
-                best_col = i
+        score = self.__max_value(state, math.inf * -1, math.inf, max_depth,
+                                 root)  # this score must be equal to root.get_value()
+        # now we must pick the state whose value is the maximum in the children list of the root
+        children: list[Node] = root.get_Childern()
+        best_col = self.__get_best_col(children)
         return best_col, score, root
 
-
-    def max_value(self, state: State, alpha, beta, remaining_depth, parent: Node):
+    def __max_value(self, state: State, alpha, beta, remaining_depth, parent: Node):
         ##############################base cases:###########################################
 
         if remaining_depth == 0:  # this means that we've reached our pre-defined depth then we return the heuristic of this state
@@ -47,7 +43,7 @@ class MinimaxWithPruning:
         for successor in successors:
             child_node = Node(-1)
             parent.add_child(child_node)  # append this node to be a child of the parent node
-            child_node.set_value(self.min_value(successor, alpha, beta, remaining_depth - 1, child_node))
+            child_node.set_value(self.__min_value(successor, alpha, beta, remaining_depth - 1, child_node))
             parent.set_value(max(child_node.get_value(), parent.get_value()))
             if parent.get_value() >= beta:  # then we prune here, and denote the parent to be pruned
                 parent.set_isPruned()
@@ -55,7 +51,7 @@ class MinimaxWithPruning:
             alpha = max(alpha, parent.get_value())
         return parent.get_value()
 
-    def min_value(self, state: State, alpha, beta, remaining_depth, parent: Node):
+    def __min_value(self, state: State, alpha, beta, remaining_depth, parent: Node):
         ##############################base cases:###########################################
 
         if remaining_depth == 0:  # this means that we've reached our pre-defined depth then we return the heuristic of this state
@@ -72,11 +68,10 @@ class MinimaxWithPruning:
         for successor in successors:
             child_node = Node(-1)
             parent.add_child(child_node)  # append this node to be a child of the parent node
-            child_node.set_value(self.max_value(successor, alpha, beta, remaining_depth - 1, child_node))
+            child_node.set_value(self.__max_value(successor, alpha, beta, remaining_depth - 1, child_node))
             parent.set_value(min(child_node.get_value(), parent.get_value()))
             if parent.get_value() <= alpha:  # then we prune here, and denote the parent to be pruned
                 parent.set_isPruned()
                 return parent.get_value()
             beta = min(beta, parent.get_value())
         return parent.get_value()
-
