@@ -1,6 +1,9 @@
 from . import Heuristic
 from . import State
 
+array = [[3, 4, 5, 7, 5, 4, 3], [4, 6, 8, 10, 8, 6, 4], [5, 8, 11, 13, 11, 8, 5], [5, 8, 11, 13, 11, 8, 5],
+         [4, 6, 8, 10, 8, 6, 4], [3, 4, 5, 7, 5, 4, 3]]
+
 
 class Heuristic2(Heuristic):
     def __int__(self):
@@ -23,36 +26,9 @@ class Heuristic2(Heuristic):
     # 3|  5  8 11 13 11  8  5
     # 4|  4  6  8 10  8  6  4
     # 5|  3  4  5  7  5  4  3
-    def calcHeuristic(self, player: int, row: int, col: int): #calculate the heuristic for each cell according to the table shown above
-        value: int
-        if col == 0 or col == 6:
-            if row == 0 or row == 5:
-                value = 3
-            elif row == 1 or row == 4:
-                value = 4
-            else:
-                value = 5
-        elif col == 1 or col == 5:
-            if row == 0 or row == 5:
-                value = 4
-            elif row == 1 or row == 4:
-                value = 6
-            else:
-                value = 8
-        elif col == 2 or col == 4:
-            if row == 0 or row == 5:
-                value = 5
-            elif row == 1 or row == 4:
-                value = 8
-            else:
-                value = 11
-        else:
-            if row == 0 or row == 5:
-                value = 7
-            elif row == 1 or row == 4:
-                value = 10
-            else:
-                value = 13
+    def calcHeuristic(self, player: int, row: int,
+                      col: int):  # calculate the heuristic for each cell according to the table shown above
+        value: int = array[row][col]
         if player == 1:  # zero sum game
             return -value
         return value
