@@ -2,20 +2,34 @@ import tkinter as tk
 from tkinter import messagebox
 import random
 
+import MiniMax
+from Heuristic.Heuristic import Heuristic
+from Heuristic.Heuristic1 import Heuristic1
+from Heuristic.Heuristic2 import Heuristic2
+from MiniMax.MinimaxWithPruning import MinimaxWithPruning
+from MiniMax.MinimaxWoPruning import MinimaxWoPruning
+from State import State
+
+
 class GUI:
     def __init__(self, master):
+
+        self.state = State()
+        self.heuristic = None
+        self.minimax = None
+
         self.master = master
         self.master.title("Connect 4 Game")
-
-
         # Initialize game variables
         self.board = [['' for _ in range(7)] for _ in range(6)]
         self.current_player = None
+        self.turn = False
         self.human_color = ''
         self.computer_color = ''
         self.human_score = 0
         self.computer_score = 0
         self.max_depth = 4
+        self.initial_depth = 4
         self.use_pruning = tk.BooleanVar(value=True)  # Default to use pruning
         self.heuristic_choice = tk.IntVar(value=1)  # Default heuristic 1
         self.game_running = False
@@ -136,31 +150,38 @@ class GUI:
         print("Use Pruning:", self.use_pruning.get())
         print("Heuristic Choice:", self.heuristic_choice.get())
 
-    def start_game(self):
-        # Print default values for testing
-        print("st Max Depth:", self.max_depth_var)
-        print("st Use Pruning:", self.use_pruning)
-        print("st Heuristic Choice:", self.heuristic_choice)
+    # def start_game(self):
+    #     if self.game_running:
+    #         # If the game is already running, reset the game
+    #         self.reset_game()
+    #     else:
+    #         # Print default values for testing
+    #         print("st Max Depth:", self.max_depth_var)
+    #         print("st Use Pruning:", self.use_pruning)
+    #         print("st Heuristic Choice:", self.heuristic_choice)
+    #         self.init_game()
+    #         # If the game is not running, start the game
+    #         self.human_color = self.color_var.get()
+    #         self.computer_color = 'Yellow' if self.human_color == 'Red' else 'Red'
+    #         self.current_player = self.human_color  # Set to human player first
+    #
+    #         # Start the game loop
+    #         self.canvas.bind("<Button-1>", self.on_column_click)
+    #         self.start_button.config(text="Restart Game")  # Change button text to indicate restart
+    #         self.game_running = True  # Set the flag to indicate that the game is running
 
-        if self.game_running:
-            # If the game is already running, reset the game
-            self.reset_game()
-        else:
-            # If the game is not running, start the game
-            self.human_color = self.color_var.get()
-            self.computer_color = 'Yellow' if self.human_color == 'Red' else 'Red'
-            self.current_player = self.human_color  # Set to human player first
-
-            # Start the game loop
-            self.canvas.bind("<Button-1>", self.on_column_click)
-            self.start_button.config(text="Restart Game")  # Change button text to indicate restart
-            self.game_running = True  # Set the flag to indicate that the game is running
-
+    def init_game(self):
+        print("init game " , self.heuristic_choice.get(), " ", self.use_pruning.get())
+        self.heuristic = self.take_heuristic(self.heuristic_choice.get())
+        self.minimax = self.take_minimax(self.heuristic, self.use_pruning.get())
 
     def reset_game(self):
+        self.init_game()
+        self.initial_depth = self.max_depth
         self.board = [['' for _ in range(7)] for _ in range(6)]
         self.human_score = 0
         self.computer_score = 0
+        self.turn = False
 
         self.current_player = self.human_color
         self.draw_board()
@@ -242,6 +263,8 @@ class GUI:
             # If the game is already running, reset the game
             self.reset_game()
         else:
+            self.init_game()
+            self.initial_depth = self.max_depth
             # If the game is not running, start the game
             self.human_color = self.color_var.get()
             self.computer_color = 'Yellow' if self.human_color == 'Red' else 'Red'
@@ -263,25 +286,62 @@ class GUI:
                 self.canvas.create_oval(x1, y1, x2, y2, fill=fill_color, outline='black')
 
 
+    def take_minimax(self, heuristic: Heuristic, use_pruning_attr):
+        if use_pruning_attr:
+            return MinimaxWithPruning(heuristic)
+        return MinimaxWoPruning(heuristic)
+
+    def take_heuristic(self, heuristic_int):
+        if heuristic_int == 1:
+            print("init game heuristic", heuristic_int)
+            return Heuristic1()
+        return Heuristic2()
+
+
+
+
     def on_column_click(self, event):
         col = event.x // 70
         print("selected col ")
         print(col)
         if self.is_valid_move(col):
             self.make_move(col)
+            #update state according to human move
+            self.state.drop_chip(col)
+
             self.draw_board()
 
             if self.check_winner():
                 self.display_winner(self.current_player)
             else:
                 self.current_player = self.computer_color
-                self.computer_move()
+                #call the computer agent
+                grid = self.state.convert_to_board()
+                computer_col, h_best_state, minimax_pointer = self.minimax.get_best_move(self.state, self.initial_depth)
+                actual_col = self.get_actual_col(grid, computer_col + 1)
+                self.state.drop_chip(actual_col)
+                print("heuristic col ", computer_col)
+                print("computer col ", actual_col)
+                self.make_move(actual_col)
+                # self.computer_move()
                 self.draw_board()
-
+                print(self.state.convert_to_board())
                 if self.check_winner():
                     self.display_winner(self.current_player)
                 else:
                     self.current_player = self.human_color
+
+        else:
+            print("not valid")
+
+    def get_actual_col(self, grid, computer_col):
+        for j in range(7):
+
+            if grid[5][j] == 0:
+                computer_col -= 1
+                if computer_col == 0:
+                    return j
+
 
     def is_valid_move(self, col):
         return self.board[0][col] == ''

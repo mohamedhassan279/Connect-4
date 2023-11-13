@@ -6,7 +6,8 @@ weights = [[3, 4, 5, 7, 5, 4, 3], [4, 6, 8, 10, 8, 6, 4], [5, 8, 11, 13, 11, 8, 
 
 
 class Heuristic2(Heuristic):
-    def __int__(self):
+    def __init__(self):
+        print("heuristic 2 created")
         pass
 
     def get_score(self, current_state: State):
@@ -16,6 +17,6 @@ class Heuristic2(Heuristic):
             for i in range(6):
                 if board[i][j] == 0:  # cell i,j is empty and thus remaining values in column is empty
                     break
-                score += self._get_score_sign(board[i][j]) * weights[i][j]
+                score += self.get_score_sign(board[i][j]) * weights[i][j]
         return score
 

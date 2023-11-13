@@ -8,6 +8,7 @@ from MiniMax.Minimax import Minimax
 class MinimaxWithPruning(Minimax):
 
     def __init__(self, heuristic: Heuristic):
+        print("with pruning created")
         self.heuristic = heuristic
 
     def get_best_move(self, state, max_depth):
