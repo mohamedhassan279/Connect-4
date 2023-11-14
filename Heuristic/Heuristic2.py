@@ -6,9 +6,6 @@ weights = [[3, 4, 5, 7, 5, 4, 3], [4, 6, 8, 10, 8, 6, 4], [5, 8, 11, 13, 11, 8, 
 
 
 class Heuristic2(Heuristic):
-    def __init__(self):
-        print("heuristic 2 created")
-        pass
 
     def get_score(self, current_state: State):
         board = current_state.convert_to_board()

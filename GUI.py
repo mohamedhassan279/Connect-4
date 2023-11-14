@@ -1,19 +1,16 @@
 import tkinter as tk
-from tkinter import messagebox
-import random
-
-import MiniMax
+import GameScore
+import PrintTree
 from Heuristic.Heuristic import Heuristic
 from Heuristic.Heuristic1 import Heuristic1
 from Heuristic.Heuristic2 import Heuristic2
 from MiniMax.MinimaxWithPruning import MinimaxWithPruning
 from MiniMax.MinimaxWoPruning import MinimaxWoPruning
 from State import State
-
+from tkinter import ttk
 
 class GUI:
     def __init__(self, master):
-
         self.state = State()
         self.heuristic = None
         self.minimax = None
@@ -35,11 +32,8 @@ class GUI:
         self.game_running = False
 
         # GUI elements
-        self.top_frame = tk.Frame(master, bg=bg_color_hex)
+        self.top_frame = tk.Frame(master, bg="#{:02x}{:02x}{:02x}".format(*(51, 50, 48)))
         self.top_frame.pack(side=tk.TOP)
-
-
-
 
         self.sidebar_frame = tk.Frame(master, width=400, bg="#{:02x}{:02x}{:02x}".format(*(95, 95, 95)))
         self.sidebar_frame.pack(side=tk.LEFT, fill=tk.Y)
@@ -48,11 +42,10 @@ class GUI:
         self.game_frame.pack(side=tk.LEFT, padx=50, pady=0)  # Added padx and pady to create space around the game grid
 
         # Top elements
-        self.human_score_label = tk.Label(self.top_frame, text="Human Score: 0", font=("Arial", 12), bg=bg_color_hex, fg='white')
-        #self.human_score_label.grid(row=0, column=0, padx=10, pady=5)
+        self.human_score_label = tk.Label(self.top_frame, text="Human Score: " + str(self.human_score), font=("Arial", 12), bg="#{:02x}{:02x}{:02x}".format(*(51, 50, 48)), fg='white')
         self.human_score_label.pack(side=tk.LEFT, padx=10)
 
-        self.computer_score_label = tk.Label(self.top_frame, text="Computer Score: 0", font=("Arial", 12), bg=bg_color_hex, fg='white')
+        self.computer_score_label = tk.Label(self.top_frame, text="Computer Score: " + str(self.computer_score), font=("Arial", 12), bg="#{:02x}{:02x}{:02x}".format(*(51, 50, 48)), fg='white')
         # self.computer_score_label.grid(row=0, column=1, padx=10, pady=5)
         self.computer_score_label.pack(side=tk.RIGHT, padx=10)
 
@@ -104,13 +97,26 @@ class GUI:
         # self.use_pruning.trace_add('write', self.update_pruning)
         # self.heuristic_choice.trace_add('write', self.update_heuristic)
 
-
         # Game Canvas
         self.canvas = tk.Canvas(self.game_frame, width=500, height=500, bg='blue')
         self.canvas.pack()  # Center the canvas in the game frame
-
+        self.center_window()
         # Initialize game
         self.initialize_game()
+
+    def center_window(self):
+        # Get the screen width and height
+        screen_width = self.master.winfo_screenwidth()
+        screen_height = self.master.winfo_screenheight()
+
+        # Calculate the window position in the middle of the screen
+        window_width = 800
+        window_height = 600
+        x_position = (screen_width - window_width) // 2
+        y_position = (screen_height - window_height) // 2
+
+        # Set the window position
+        self.master.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
 
     def validate_entry(self, value):
         # Validate function to allow only integer values
@@ -124,13 +130,6 @@ class GUI:
         # Function to update max_depth when max_depth_var changes
         max_depth_value = self.max_depth_var.get()
         self.max_depth = int(max_depth_value) if max_depth_value.isdigit() else 4
-        print("Max Depth:", self.max_depth)
-
-    # def update_pruning(self, *args):
-    #     self.use_pruning.get()
-    #
-    # def update_heuristic(self, *args):
-    #     self.heuristic_choice.get()
 
     def initialize_game(self):
         # Initialize game based on user choices (color, max depth, pruning, heuristic)
@@ -145,48 +144,24 @@ class GUI:
         # Update color selection with colored indicators
         self.update_selection()
 
-        # Print default values for testing
-        print("Max Depth:", self.max_depth_var.get())
-        print("Use Pruning:", self.use_pruning.get())
-        print("Heuristic Choice:", self.heuristic_choice.get())
-
-    # def start_game(self):
-    #     if self.game_running:
-    #         # If the game is already running, reset the game
-    #         self.reset_game()
-    #     else:
-    #         # Print default values for testing
-    #         print("st Max Depth:", self.max_depth_var)
-    #         print("st Use Pruning:", self.use_pruning)
-    #         print("st Heuristic Choice:", self.heuristic_choice)
-    #         self.init_game()
-    #         # If the game is not running, start the game
-    #         self.human_color = self.color_var.get()
-    #         self.computer_color = 'Yellow' if self.human_color == 'Red' else 'Red'
-    #         self.current_player = self.human_color  # Set to human player first
-    #
-    #         # Start the game loop
-    #         self.canvas.bind("<Button-1>", self.on_column_click)
-    #         self.start_button.config(text="Restart Game")  # Change button text to indicate restart
-    #         self.game_running = True  # Set the flag to indicate that the game is running
-
     def init_game(self):
-        print("init game " , self.heuristic_choice.get(), " ", self.use_pruning.get())
         self.heuristic = self.take_heuristic(self.heuristic_choice.get())
         self.minimax = self.take_minimax(self.heuristic, self.use_pruning.get())
 
     def reset_game(self):
         self.init_game()
+        self.state = State()
         self.initial_depth = self.max_depth
         self.board = [['' for _ in range(7)] for _ in range(6)]
         self.human_score = 0
         self.computer_score = 0
         self.turn = False
-
         self.current_player = self.human_color
         self.draw_board()
-        self.start_button.config(text="Start Game")  # Change button text back to "Start Game"
+        #self.start_button.config(text="Start Game")  # Change button text back to "Start Game"
         self.game_running = False  # Set the flag to indicate that the game is not running
+        self.update_human_score(self.human_score)
+        self.update_computer_score(self.computer_score)
 
     def update_selection(self):
         # Destroy existing color selection widgets
@@ -243,7 +218,6 @@ class GUI:
                                                 value=2)
         self.heuristic_radio_1.pack()
         self.heuristic_radio_2.pack()
-
         # self.use_pruning.trace_add('write', self.update_pruning)
         # self.heuristic_choice.trace_add('write', self.update_heuristic)
 
@@ -251,18 +225,17 @@ class GUI:
         self.start_button = tk.Button(self.sidebar_frame, text="Start Game", command=self.start_game)
         self.start_button.pack(pady=20)
 
-
-
     def start_game(self):
-        # Print default values for testing
-        print("Max Depth:", self.max_depth)
-        print("Use Pruning:", self.use_pruning.get())
-        print("Heuristic Choice:", self.heuristic_choice.get())
-
         if self.game_running:
             # If the game is already running, reset the game
             self.reset_game()
         else:
+            self.state = State()
+            self.board = [['' for _ in range(7)] for _ in range(6)]
+            self.human_score = 0
+            self.computer_score = 0
+            self.turn = False
+            self.current_player = self.human_color
             self.init_game()
             self.initial_depth = self.max_depth
             # If the game is not running, start the game
@@ -274,6 +247,8 @@ class GUI:
             self.canvas.bind("<Button-1>", self.on_column_click)
             self.start_button.config(text="Restart Game")  # Change button text to indicate restart
             self.game_running = True  # Set the flag to indicate that the game is running
+            self.update_human_score(self.human_score)
+            self.update_computer_score(self.computer_score)
 
     def draw_board(self):
         self.canvas.delete("all")
@@ -293,58 +268,62 @@ class GUI:
 
     def take_heuristic(self, heuristic_int):
         if heuristic_int == 1:
-            print("init game heuristic", heuristic_int)
             return Heuristic1()
         return Heuristic2()
 
-
-
-
     def on_column_click(self, event):
         col = event.x // 70
-        print("selected col ")
-        print(col)
         if self.is_valid_move(col):
             self.make_move(col)
             #update state according to human move
             self.state.drop_chip(col)
-
+            human_score, agent_score = GameScore.get_game_score(self.state)
+            self.update_human_score(human_score)
+            self.update_computer_score(agent_score)
             self.draw_board()
 
-            if self.check_winner():
-                self.display_winner(self.current_player)
+            self.canvas.update_idletasks()
+            # here add wait so the draw board is done immediately
+            game_state = self.check_winner()
+            if game_state != -1:
+                self.display_winner(game_state)
             else:
                 self.current_player = self.computer_color
                 #call the computer agent
                 grid = self.state.convert_to_board()
                 computer_col, h_best_state, minimax_pointer = self.minimax.get_best_move(self.state, self.initial_depth)
+
+                PrintTree.print_tree_console(minimax_pointer)
+                print("________________________________________________________________________________________________")
+
                 actual_col = self.get_actual_col(grid, computer_col + 1)
                 self.state.drop_chip(actual_col)
-                print("heuristic col ", computer_col)
-                print("computer col ", actual_col)
                 self.make_move(actual_col)
                 # self.computer_move()
+
+                human_score, agent_score = GameScore.get_game_score(self.state)
+
+                self.update_human_score(human_score)
+                self.update_computer_score(agent_score)
+
                 self.draw_board()
-                print(self.state.convert_to_board())
-                if self.check_winner():
-                    self.display_winner(self.current_player)
+                self.canvas.update_idletasks()
+
+                game_state = self.check_winner()
+                if game_state != -1:
+                    self.display_winner(game_state)
                 else:
                     self.current_player = self.human_color
 
-        else:
-            print("not valid")
-
     def get_actual_col(self, grid, computer_col):
         for j in range(7):
-
             if grid[5][j] == 0:
                 computer_col -= 1
                 if computer_col == 0:
                     return j
 
-
     def is_valid_move(self, col):
-        return self.board[0][col] == ''
+        return col <= 6 and col >= 0 and self.board[0][col] == ''
 
     def make_move(self, col):
         for row in range(5, -1, -1):
@@ -354,76 +333,71 @@ class GUI:
 
     def check_winner(self):
         # Implement your winning condition check here
-        pass
+        moves = self.state.get_moves()
+        if moves == 42:
+            if self.computer_score > self.human_score:
+                return 2
+            return self.computer_score < self.human_score
+        return -1
 
-    def display_winner(self, winner):
-        messagebox.showinfo("Game Over", f"{winner} wins!")
-        self.reset_game()
-
-    # def reset_game(self):
-    #     self.board = [['' for _ in range(7)] for _ in range(6)]
-    #     self.current_player = self.human_color
-    #     self.draw_board()
-    #     self.start_button.config(state=tk.NORMAL)
-
-    def computer_move(self):
-        # Implement a basic AI move (minimax)
-        col = self.minimax(self.board, self.max_depth, True)[0]
-        if self.is_valid_move(col):
-            self.make_move(col)
-
-    def minimax(self, board, depth, maximizing_player):
-        # Basic minimax implementation for AI move
-        # You can enhance this with alpha-beta pruning for better performance
-        if depth == 0 or self.check_winner():
-            return None, self.evaluate_board()
-
-        valid_moves = [col for col in range(7) if self.is_valid_move(col)]
-
-        if maximizing_player:
-            value = float('-inf')
-            best_col = random.choice(valid_moves)
-            for col in valid_moves:
-                temp_board = [row[:] for row in board]
-                self.make_move(col)
-                _, temp_value = self.minimax(temp_board, depth - 1, False)
-                if temp_value > value:
-                    value = temp_value
-                    best_col = col
-                self.undo_move(col)
-            return best_col, value
+    def display_winner(self, state):
+        if state == 1:
+            winner = self.human_color
         else:
-            value = float('inf')
-            best_col = random.choice(valid_moves)
-            for col in valid_moves:
-                temp_board = [row[:] for row in board]
-                self.make_move(col)
-                _, temp_value = self.minimax(temp_board, depth - 1, True)
-                if temp_value < value:
-                    value = temp_value
-                    best_col = col
-                self.undo_move(col)
-            return best_col, value
+            winner = self.computer_color
+        # Create a themed style
+        style = ttk.Style()
 
-    def evaluate_board(self):
-        # Basic evaluation function for AI move
-        # You can enhance this based on your heuristic
-        return 0
+        style.configure("Custom.TLabel", font=("Arial", 14, "bold"), foreground=winner, background="black")
 
-    def undo_move(self, col):
-        for row in range(6):
-            if self.board[row][col] != '':
-                self.board[row][col] = ''
-                break
+        # Create a Toplevel window for a custom-styled message box
+        custom_message_box = tk.Toplevel(self.master)
+        custom_message_box.title("Game End")
+
+        # Get the screen width and height
+        screen_width = custom_message_box.winfo_screenwidth()
+        screen_height = custom_message_box.winfo_screenheight()
+
+        # Calculate the window position in the middle of the screen
+        window_width = 300
+        window_height = 100
+        x_position = (screen_width - window_width) // 2
+        y_position = (screen_height - window_height) // 2
+
+        # Set the window position
+        custom_message_box.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
+
+        # Change the window background color to grey
+        custom_message_box.configure(bg="grey")
+
+        # Create a Label with custom style
+        if state == 0:
+            text_display = "draw"
+        else:
+            text_display = f"{winner} wins!"
+        message_label = ttk.Label(custom_message_box, text=text_display, style="Custom.TLabel", background="grey")
+        message_label.pack(padx=10, pady=10)
+
+        # Add a button to close the message box and reset the game
+        ok_button = tk.Button(custom_message_box, text="OK", background="#{:02x}{:02x}{:02x}".format(*(122, 122, 235)), command=lambda: self.reset_game_message(custom_message_box))
+        ok_button.pack(pady=5)
+
+    def reset_game_message(self, window):
+        window.destroy()
+
+    def update_human_score(self, score):
+        self.human_score = score
+        self.human_score_label.config(text="Human Score: " + str(self.human_score))
+
+    def update_computer_score(self, score):
+        self.computer_score = score
+        self.computer_score_label.config(text="Computer Score: " + str(self.computer_score))
 
 # Create the main application window
 root = tk.Tk()
 root.geometry("800x600")
 
-bg_color_rgb = (51, 50, 48)
-bg_color_hex = "#{:02x}{:02x}{:02x}".format(*bg_color_rgb)
-
-root.configure(bg=bg_color_hex)
+root.configure(bg="#{:02x}{:02x}{:02x}".format(*(51, 50, 48)))
 
 # Create and run the GUI instance
 game = GUI(root)

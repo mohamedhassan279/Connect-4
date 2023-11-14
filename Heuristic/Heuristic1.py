@@ -5,8 +5,6 @@ from State import State
 
 
 class Heuristic1(Heuristic):
-    def __init__(self):
-        print("heuristic 1 created")
     max_score = math.pow(10, 12)
 
     def get_score(self, current_state: State):

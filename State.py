@@ -30,6 +30,8 @@ class State:
     increasing i moves up in the board
     increasing j moves right in the board
     """
+    def get_moves(self):
+        return self.__moves
     def convert_to_board(self):
         board = [[0 for _ in range(7)] for _ in range(6)]
         for j in range(7):
