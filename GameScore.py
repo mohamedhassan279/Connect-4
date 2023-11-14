@@ -39,7 +39,7 @@ def __col_score(player, board):
             if counter == 4:
                 score += 1
                 i += 1
-        return score
+    return score
 
 
 def __diagonal_score(player, board):
