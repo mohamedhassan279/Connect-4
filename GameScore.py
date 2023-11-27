@@ -1,6 +1,5 @@
 from State import State
 
-
 def get_game_score(state: State):
     board = state.convert_to_board()
     human_score = __row_score(1, board) + __col_score(1, board) + __diagonal_score(1, board)

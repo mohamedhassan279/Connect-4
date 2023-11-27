@@ -1,3 +1,4 @@
+import time
 import tkinter as tk
 import GameScore
 import PrintTree
@@ -291,9 +292,18 @@ class GUI:
                 self.current_player = self.computer_color
                 #call the computer agent
                 grid = self.state.convert_to_board()
-                computer_col, h_best_state, minimax_pointer = self.minimax.get_best_move(self.state, self.initial_depth)
+
+                start_time = time.time()
+                computer_col, h_best_state, minimax_pointer, nodes_expanded = self.minimax.get_best_move(self.state, self.initial_depth)
+                end_time = time.time()
+                time_elapsed = end_time - start_time
 
                 PrintTree.print_tree_console(minimax_pointer)
+
+                print()
+                print("Number of nodes expanded = " + str(nodes_expanded) + " Nodes")
+                print()
+                print("Time taken = " + str(time_elapsed) + " Seconds")
                 print("________________________________________________________________________________________________")
 
                 actual_col = self.get_actual_col(grid, computer_col + 1)

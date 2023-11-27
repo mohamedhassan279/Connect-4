@@ -8,6 +8,7 @@ from MiniMax.Minimax import Minimax
 class MinimaxWoPruning(Minimax):
     def __init__(self, heuristic):
         self.__heuristic: Heuristic = heuristic
+        self.nodes_expanded = 0
 
     def get_best_move(self, state, max_depth):
         """
@@ -18,18 +19,22 @@ class MinimaxWoPruning(Minimax):
                      if the game will end after some levels < max_depth
          """
         root = Node(-1)
+        self.nodes_expanded = 0
         score = self.__max_value(state, max_depth, root)  # this score must be equal to root.get_value()
         # now we must pick the state whose value is the maximum in the children list of the root
         children: list[Node] = root.get_Childern()
         best_col = self.get_best_col(children)
-        return best_col, score, root
+        return best_col, score, root, self.nodes_expanded
 
     def __min_value(self, state: State, max_depth: int, root: Node):
         if max_depth == 0:  # terminal state
             return self.__heuristic.get_score(state)
+
         children = state.get_successors()
+
         if len(children) == 0:  # no children
             return self.__heuristic.get_score(state)
+        self.nodes_expanded += 1
         root.set_value(math.inf)  # initially infinity
         for s in children:
             child = Node(-1)  # make new node initially its value=-1
@@ -41,9 +46,12 @@ class MinimaxWoPruning(Minimax):
     def __max_value(self, state: State, max_depth: int, root: Node):
         if max_depth == 0:  # terminal state
             return self.__heuristic.get_score(state)
+
         children = state.get_successors()
         if len(children) == 0:  # no children
             return self.__heuristic.get_score(state)
+        self.nodes_expanded += 1
+
         root.set_value(-math.inf)  # initially -infinity
         for s in children:
             child = Node(-1)  # make new node initially its value=-1

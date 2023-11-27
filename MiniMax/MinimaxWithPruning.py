@@ -9,6 +9,7 @@ class MinimaxWithPruning(Minimax):
 
     def __init__(self, heuristic: Heuristic):
         self.heuristic = heuristic
+        self.nodesExpanded = 0
 
     def get_best_move(self, state, max_depth):
         """
@@ -19,12 +20,13 @@ class MinimaxWithPruning(Minimax):
                      if the game will end after some levels < max_depth
          """
         root = Node(-1)
+        self.nodesExpanded = 0
         score = self.__max_value(state, math.inf * -1, math.inf, max_depth,
                                  root)  # this score must be equal to root.get_value()
         # now we must pick the state whose value is the maximum in the children list of the root
         children: list[Node] = root.get_Childern()
         best_col = self.get_best_col(children)
-        return best_col, score, root
+        return best_col, score, root, self.nodesExpanded
 
     def __max_value(self, state: State, alpha, beta, remaining_depth, parent: Node):
         ##############################base cases:###########################################
@@ -33,6 +35,7 @@ class MinimaxWithPruning(Minimax):
             return self.heuristic.get_score(state)
 
         successors = state.get_successors()
+        self.nodesExpanded += 1
 
         if len(successors) == 0:  # then it means that the current state has no successors (game completed) so we return its heuristic
             return self.heuristic.get_score(state)
@@ -58,6 +61,7 @@ class MinimaxWithPruning(Minimax):
             return self.heuristic.get_score(state)
 
         successors = state.get_successors()
+        self.nodesExpanded += 1
 
         if len(successors) == 0:  # then it means that the current state has no successors (game completed) so we return its heuristic
             return self.heuristic.get_score(state)
