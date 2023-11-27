@@ -1,3 +1,4 @@
+import time
 import tkinter as tk
 import GameScore
 import PrintTree
@@ -8,6 +9,7 @@ from MiniMax.MinimaxWithPruning import MinimaxWithPruning
 from MiniMax.MinimaxWoPruning import MinimaxWoPruning
 from State import State
 from tkinter import ttk
+
 
 class GUI:
     def __init__(self, master):
@@ -42,10 +44,14 @@ class GUI:
         self.game_frame.pack(side=tk.LEFT, padx=50, pady=0)  # Added padx and pady to create space around the game grid
 
         # Top elements
-        self.human_score_label = tk.Label(self.top_frame, text="Human Score: " + str(self.human_score), font=("Arial", 12), bg="#{:02x}{:02x}{:02x}".format(*(51, 50, 48)), fg='white')
+        self.human_score_label = tk.Label(self.top_frame, text="Human Score: " + str(self.human_score),
+                                          font=("Arial", 12), bg="#{:02x}{:02x}{:02x}".format(*(51, 50, 48)),
+                                          fg='white')
         self.human_score_label.pack(side=tk.LEFT, padx=10)
 
-        self.computer_score_label = tk.Label(self.top_frame, text="Computer Score: " + str(self.computer_score), font=("Arial", 12), bg="#{:02x}{:02x}{:02x}".format(*(51, 50, 48)), fg='white')
+        self.computer_score_label = tk.Label(self.top_frame, text="Computer Score: " + str(self.computer_score),
+                                             font=("Arial", 12), bg="#{:02x}{:02x}{:02x}".format(*(51, 50, 48)),
+                                             fg='white')
         # self.computer_score_label.grid(row=0, column=1, padx=10, pady=5)
         self.computer_score_label.pack(side=tk.RIGHT, padx=10)
 
@@ -91,6 +97,7 @@ class GUI:
                                                 value=1)
         self.heuristic_radio_2 = tk.Radiobutton(self.sidebar_frame, text='Heuristic 2', variable=self.heuristic_choice,
                                                 value=2)
+
         self.heuristic_radio_1.pack()
         self.heuristic_radio_2.pack()
 
@@ -158,7 +165,7 @@ class GUI:
         self.turn = False
         self.current_player = self.human_color
         self.draw_board()
-        #self.start_button.config(text="Start Game")  # Change button text back to "Start Game"
+        # self.start_button.config(text="Start Game")  # Change button text back to "Start Game"
         self.game_running = False  # Set the flag to indicate that the game is not running
         self.update_human_score(self.human_score)
         self.update_computer_score(self.computer_score)
@@ -216,6 +223,10 @@ class GUI:
         self.heuristic_radio_2 = tk.Radiobutton(self.sidebar_frame, text='Heuristic 2',
                                                 variable=self.heuristic_choice,
                                                 value=2)
+        self.pruning_radio_on.configure(bg="#{:02x}{:02x}{:02x}".format(*(95, 95, 95)))
+        self.pruning_radio_off.configure(bg="#{:02x}{:02x}{:02x}".format(*(95, 95, 95)))
+        self.heuristic_radio_1.configure(bg="#{:02x}{:02x}{:02x}".format(*(95, 95, 95)))
+        self.heuristic_radio_2.configure(bg="#{:02x}{:02x}{:02x}".format(*(95, 95, 95)))
         self.heuristic_radio_1.pack()
         self.heuristic_radio_2.pack()
         # self.use_pruning.trace_add('write', self.update_pruning)
@@ -260,7 +271,6 @@ class GUI:
                 fill_color = 'white' if self.board[row][col] == '' else self.board[row][col]
                 self.canvas.create_oval(x1, y1, x2, y2, fill=fill_color, outline='black')
 
-
     def take_minimax(self, heuristic: Heuristic, use_pruning_attr):
         if use_pruning_attr:
             return MinimaxWithPruning(heuristic)
@@ -275,7 +285,7 @@ class GUI:
         col = event.x // 70
         if self.is_valid_move(col):
             self.make_move(col)
-            #update state according to human move
+            # update state according to human move
             self.state.drop_chip(col)
             human_score, agent_score = GameScore.get_game_score(self.state)
             self.update_human_score(human_score)
@@ -289,9 +299,12 @@ class GUI:
                 self.display_winner(game_state)
             else:
                 self.current_player = self.computer_color
-                #call the computer agent
+                # call the computer agent
                 grid = self.state.convert_to_board()
+                # start_time = time.time()
                 computer_col, h_best_state, minimax_pointer = self.minimax.get_best_move(self.state, self.initial_depth)
+                # end_time = time.time()
+                # print("execution time: ", ((end_time - start_time) * 1000), " ms")
 
                 PrintTree.print_tree_console(minimax_pointer)
                 print("________________________________________________________________________________________________")
@@ -379,7 +392,8 @@ class GUI:
         message_label.pack(padx=10, pady=10)
 
         # Add a button to close the message box and reset the game
-        ok_button = tk.Button(custom_message_box, text="OK", background="#{:02x}{:02x}{:02x}".format(*(122, 122, 235)), command=lambda: self.reset_game_message(custom_message_box))
+        ok_button = tk.Button(custom_message_box, text="OK", background="#{:02x}{:02x}{:02x}".format(*(122, 122, 235)),
+                              command=lambda: self.reset_game_message(custom_message_box))
         ok_button.pack(pady=5)
 
     def reset_game_message(self, window):
@@ -393,6 +407,7 @@ class GUI:
         self.computer_score = score
         self.computer_score_label.config(text="Computer Score: " + str(self.computer_score))
 
+
 # Create the main application window
 root = tk.Tk()
 root.geometry("800x600")
@@ -404,7 +419,3 @@ game = GUI(root)
 
 # Start the Tkinter event loop
 root.mainloop()
-
-
-
-
